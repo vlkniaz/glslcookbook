@@ -5,6 +5,7 @@
 #include "scene.h"
 #include "scenetexture.h"
 #include "scenealphatest.h"
+#include "sceneobj.h"
 #include "scenemultitex.h"
 #include "scenenormalmap.h"
 #include "sceneprojtex.h"
@@ -121,6 +122,8 @@ string parseCLArgs(int argc, char ** argv) {
 
 	if( recipe == "alpha-test" ) {
 		scene = new SceneAlphaTest();
+    } else if( recipe == "obj") {
+        scene = new SceneObj();
 	} else if( recipe == "multi-tex") {
 		scene = new SceneMultiTex();
 	} else if( recipe == "normal-map") {

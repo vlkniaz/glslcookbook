@@ -1,5 +1,6 @@
 set( ingredients_SOURCES vboteapotpatch.cpp
 	vboteapot.cpp
+	vboobj.cpp
 	drawable.cpp 
 	vbomeshadj.cpp 
 	vbotorus.cpp 
@@ -11,8 +12,11 @@ set( ingredients_SOURCES vboteapotpatch.cpp
         vbosphere.cpp
 	bmpreader.cpp
 	tgaio.cpp
+	tiny_obj_loader.cc
 		cookbookogl.h
 		scene.h
+		vboobj.h
+		tiny_obj_loader.h
 		teapotdata.h
 		glad/src/glad.c)
 

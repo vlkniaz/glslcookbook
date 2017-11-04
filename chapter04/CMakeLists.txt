@@ -5,6 +5,7 @@ set( chapter04_SOURCES
 	scenerendertotex.cpp
 	scenemultitex.cpp
 	scenealphatest.cpp
+	sceneobj.cpp
 	scenereflectcube.cpp
 	skybox.cpp
 	scenenormalmap.cpp
