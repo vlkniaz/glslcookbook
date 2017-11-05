@@ -177,8 +177,15 @@ VBOObj::VBOObj(std::string inputfile)
     // создаём массив нормалей вершин
     float *normals = new float[attrib.vertices.size() * 3];
     
+    // создаём массив цветов вершин
+    float *colors = new float[attrib.vertices.size() * 3];
+    
     size_t indices_size = shapes[0].mesh.indices.size();
     GLuint *indices = new GLuint[indices_size];
+    float c1, c2, c3;
+    c1 = 1.0;
+    c2 = 0.0;
+    c3 = 0.0;
     for(size_t j = 0; j < indices_size; j++)
     {
         size_t vertex_index = shapes[0].mesh.indices[j].vertex_index;
@@ -188,6 +195,27 @@ VBOObj::VBOObj(std::string inputfile)
         normals[3 * vertex_index + 0] = attrib.normals[3 * normal_index + 0];
         normals[3 * vertex_index + 1] = attrib.normals[3 * normal_index + 1];
         normals[3 * vertex_index + 2] = attrib.normals[3 * normal_index + 2];
+        
+        // заполняем псевдо-цвета вершин
+        colors[3 * vertex_index + 0] = c1;
+        colors[3 * vertex_index + 1] = c2;
+        colors[3 * vertex_index + 2] = c3;
+        
+        if(c1 == 1.0)
+        {
+            c1 = 0.0;
+            c2 = 1.0;
+        }
+        else if(c2 == 1.0)
+        {
+            c2 = 0.0;
+            c3 = 1.0;
+        }
+        else if(c3 == 1.0)
+        {
+            c3 = 0.0;
+            c1 = 1.0;
+        }
     }
 
     glGenVertexArrays( 1, &vaoHandle );
@@ -206,10 +234,10 @@ VBOObj::VBOObj(std::string inputfile)
     glVertexAttribPointer( (GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)) );
     glEnableVertexAttribArray(1);  // Vertex normal
 
-    //glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
-    //glBufferData(GL_ARRAY_BUFFER, 24 * 2 * sizeof(float), tex, GL_STATIC_DRAW);
-    //glVertexAttribPointer( (GLuint)2, 2, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)) );
-    //glEnableVertexAttribArray(2);  // texture coords
+    glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
+    glBufferData(GL_ARRAY_BUFFER, attrib.vertices.size() * sizeof(float), colors, GL_STATIC_DRAW);
+    glVertexAttribPointer( (GLuint)2, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)) );
+    glEnableVertexAttribArray(2);  // texture coords
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices_size * sizeof(GLuint), indices, GL_STATIC_DRAW);
