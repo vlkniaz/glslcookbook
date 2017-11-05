@@ -6,6 +6,22 @@
 #include <cstdio>
 #include <iostream>
 
+#include <glm/glm.hpp>
+
+using glm::vec3;
+
+double pointToLineDistance(vec3 x0, vec3 x1, vec3 x2)
+{
+    double d, num, denum;
+    
+    num = glm::length(glm::cross(x2 - x1, x1 - x0));
+    denum = glm::length(x2 - x1);
+    
+    d = num / denum;
+    
+    return d;
+}
+
 VBOObj::VBOObj(std::string inputfile)
 {
     std::string err;
@@ -174,48 +190,84 @@ VBOObj::VBOObj(std::string inputfile)
         20,21,22,20,22,23
     };*/
     
+    // создаём новый список вершин, в котором у каждого треугольника свои вершины
+    int vertices_count = shapes[0].mesh.num_face_vertices.size() * 3 * 3;
+    float *vertices = new float[vertices_count];
+    
     // создаём массив нормалей вершин
-    float *normals = new float[attrib.vertices.size() * 3];
+    float *normals = new float[vertices_count];
     
     // создаём массив цветов вершин
-    float *colors = new float[attrib.vertices.size() * 3];
+    float *colors = new float[vertices_count];
     
     size_t indices_size = shapes[0].mesh.indices.size();
     GLuint *indices = new GLuint[indices_size];
-    float c1, c2, c3;
-    c1 = 1.0;
-    c2 = 0.0;
-    c3 = 0.0;
+    
+    // цикл по всем вершинам
     for(size_t j = 0; j < indices_size; j++)
     {
         size_t vertex_index = shapes[0].mesh.indices[j].vertex_index;
         size_t normal_index = shapes[0].mesh.indices[j].normal_index;
         indices[j] = vertex_index;
+        
+        // копируем вершины
+        vertices[3 * j + 0] = attrib.vertices[3 * vertex_index + 0];
+        vertices[3 * j + 1] = attrib.vertices[3 * vertex_index + 1];
+        vertices[3 * j + 2] = attrib.vertices[3 * vertex_index + 2];
+        
         // копируем нормали в порядке следования вершин
-        normals[3 * vertex_index + 0] = attrib.normals[3 * normal_index + 0];
-        normals[3 * vertex_index + 1] = attrib.normals[3 * normal_index + 1];
-        normals[3 * vertex_index + 2] = attrib.normals[3 * normal_index + 2];
+        normals[3 * j + 0] = attrib.normals[3 * normal_index + 0];
+        normals[3 * j + 1] = attrib.normals[3 * normal_index + 1];
+        normals[3 * j + 2] = attrib.normals[3 * normal_index + 2];
         
-        // заполняем псевдо-цвета вершин
-        colors[3 * vertex_index + 0] = c1;
-        colors[3 * vertex_index + 1] = c2;
-        colors[3 * vertex_index + 2] = c3;
+        indices[j] = j;
+    }
+    
+    // цикл по тройкам вершинам (треугольникам)
+    for(size_t j = 0; j < indices_size; j+=3)
+    {
+        // индексы трёх вершин треугольника
+        size_t a_index = j + 0;
+        size_t b_index = j + 1;
+        size_t c_index = j + 2;
         
-        if(c1 == 1.0)
-        {
-            c1 = 0.0;
-            c2 = 1.0;
-        }
-        else if(c2 == 1.0)
-        {
-            c2 = 0.0;
-            c3 = 1.0;
-        }
-        else if(c3 == 1.0)
-        {
-            c3 = 0.0;
-            c1 = 1.0;
-        }
+        // получаем координаты 3 вершин треугольника
+        vec3 a, b, c;
+        a.x = vertices[3 * a_index + 0];
+        a.y = vertices[3 * a_index + 1];
+        a.z = vertices[3 * a_index + 2];
+        
+        b.x = vertices[3 * b_index + 0];
+        b.y = vertices[3 * b_index + 1];
+        b.z = vertices[3 * b_index + 2];
+        
+        c.x = vertices[3 * c_index + 0];
+        c.y = vertices[3 * c_index + 1];
+        c.z = vertices[3 * c_index + 2];
+        
+        // вычисляем высоты треугольников
+        double ha, hb, hc;
+        
+        ha = pointToLineDistance(a, b, c);
+        hb = pointToLineDistance(b, c, a);
+        hc = pointToLineDistance(c, a, b);
+        
+        // заполняем псевдо-цвета (высоты) вершин
+        
+        // вершина a
+        colors[3 * a_index + 0] = ha;
+        colors[3 * a_index + 1] = 0.0;
+        colors[3 * a_index + 2] = 0.0;
+        
+        // вершина b
+        colors[3 * b_index + 0] = 0.0;
+        colors[3 * b_index + 1] = hb;
+        colors[3 * b_index + 2] = 0.0;
+        
+        // вершина c
+        colors[3 * c_index + 0] = 0.0;
+        colors[3 * c_index + 1] = 0.0;
+        colors[3 * c_index + 2] = hc;
     }
 
     glGenVertexArrays( 1, &vaoHandle );
@@ -225,17 +277,17 @@ VBOObj::VBOObj(std::string inputfile)
     glGenBuffers(4, handle);
 
     glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
-    glBufferData(GL_ARRAY_BUFFER, attrib.vertices.size() * sizeof(float), attrib.vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices_count * sizeof(float), vertices, GL_STATIC_DRAW);
     glVertexAttribPointer( (GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)) );
     glEnableVertexAttribArray(0);  // Vertex position
 
     glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-    glBufferData(GL_ARRAY_BUFFER, attrib.vertices.size() * sizeof(float), normals, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices_count * sizeof(float), normals, GL_STATIC_DRAW);
     glVertexAttribPointer( (GLuint)1, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)) );
     glEnableVertexAttribArray(1);  // Vertex normal
 
     glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
-    glBufferData(GL_ARRAY_BUFFER, attrib.vertices.size() * sizeof(float), colors, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices_count * sizeof(float), colors, GL_STATIC_DRAW);
     glVertexAttribPointer( (GLuint)2, 3, GL_FLOAT, GL_FALSE, 0, ((GLubyte *)NULL + (0)) );
     glEnableVertexAttribArray(2);  // texture coords
 
