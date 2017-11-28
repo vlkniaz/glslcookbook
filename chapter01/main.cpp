@@ -49,20 +49,21 @@ int main(int argc, char *argv[])
 
 	// Initialize GLFW
 	if( !glfwInit() ) exit( EXIT_FAILURE );
+    
 
 #ifdef __APPLE__
   // Select OpenGL 4.1
-	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-	glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 1 );
+	//glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
+	//glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 1 );
 #else
   	// Select OpenGL 4.3
   glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
   glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
 #endif
-	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_RESIZABLE, false);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
+	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true);
+	//glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	//glfwWindowHint(GLFW_RESIZABLE, false);
+	//glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, true);
 
 	// Open the window
 	string title = "Chapter 01 -- " + recipe;

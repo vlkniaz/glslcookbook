@@ -297,7 +297,8 @@ VBOObj::VBOObj(std::string inputfile)
     glBindVertexArray(0);
 }
 
-void VBOObj::render() {
+void VBOObj::render()
+{
     glBindVertexArray(vaoHandle);
     glDrawElements(GL_TRIANGLES, shapes[0].mesh.indices.size(), GL_UNSIGNED_INT, ((GLubyte *)NULL + (0)));
 }

@@ -16,7 +16,7 @@ using glm::vec3;
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/constants.hpp>
 
-SceneObj::SceneObj() : angle(0.0f), tPrev(0.0f), rotSpeed(glm::pi<float>() / 2.0f) { }
+SceneObj::SceneObj() : angle(0.0f), tPrev(0.0f), rotSpeed(glm::pi<float>() / 2.0f), mode(0) { }
 
 void SceneObj::initScene()
 {
@@ -65,18 +65,49 @@ void SceneObj::render()
 
     vec3 cameraPos = vec3(6.0f * cos(angle), 0.25f, 6.0f * sin(angle));
     view = glm::lookAt(cameraPos, vec3(0.0f,0.0f,0.0f), vec3(0.0f,1.0f,0.0f));
+    
+    glEnable(GL_CULL_FACE);
+    
+    if(mode == 1)
+    {
+        // рисуем обводку объекта
+        glCullFace(GL_FRONT);
 
+        prog.setUniform("Light.Position", vec4(0.0f,0.0f,0.0f,1.0f) );
+        prog.setUniform("Material.Kd", 0.0f, 0.0f, 0.0f);
+        prog.setUniform("Material.Ks", 0.0f, 0.0f, 0.0f);
+        prog.setUniform("Material.Ka", 0.0f, 0.0f, 0.0f);
+        prog.setUniform("Material.Shininess", 0.0f);
+        
+        model = mat4(1.0f);
+        model = glm::translate(model, vec3(0.0f,-1.5f,0.0f));
+        model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f,0.0f,0.0f));
+        model = glm::scale(model, vec3(1.05, 1.05, 1.05));
+        setMatrices();
+        object->render();
+    }
+    
+    // рисуем сам объект
+    glCullFace(GL_BACK);
+    
     prog.setUniform("Light.Position", vec4(0.0f,0.0f,0.0f,1.0f) );
     prog.setUniform("Material.Kd", 0.9f, 0.9f, 0.9f);
     prog.setUniform("Material.Ks", 0.0f, 0.0f, 0.0f);
     prog.setUniform("Material.Ka", 0.1f, 0.1f, 0.1f);
     prog.setUniform("Material.Shininess", 100.0f);
-
+    if(mode == 1)
+    {
+        prog.setUniform("SilhouetteMode", 1.0f);
+    }
+    else
+    {
+        prog.setUniform("SilhouetteMode", 0.0f);
+    }
+    
     model = mat4(1.0f);
     model = glm::translate(model, vec3(0.0f,-1.5f,0.0f));
     model = glm::rotate(model, glm::radians(-90.0f), vec3(1.0f,0.0f,0.0f));
     setMatrices();
-    //teapot->render();
     object->render();
 }
 

@@ -38,6 +38,8 @@ public:
     void update( float t );
     void render();
     void resize(int, int);
+    
+    int mode;
 };
 
 #endif // SCENEOBJ_H

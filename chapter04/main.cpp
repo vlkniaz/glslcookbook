@@ -29,8 +29,22 @@ void printHelpInfo(const char *);
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
     if (key == GLFW_KEY_SPACE && action == GLFW_RELEASE)
+    {
         if( scene )
         	scene->animate( ! (scene->animating()) );
+    }
+    else if(key == GLFW_KEY_M && action == GLFW_RELEASE)
+    {
+        if(scene)
+        {
+            SceneObj* sceneObj = dynamic_cast<SceneObj*>(scene);
+            sceneObj->mode++;
+            if(sceneObj->mode > 1)
+            {
+                sceneObj->mode = 0;
+            }
+        }
+    }
 }
 
 void initializeGL() {
@@ -67,8 +81,8 @@ int main(int argc, char *argv[])
 
   #ifdef __APPLE__
     // Select OpenGL 4.1
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 1 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+    glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 3 );
   #else
   	// Select OpenGL 4.3
   	glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
@@ -76,8 +90,8 @@ int main(int argc, char *argv[])
   #endif
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
-	glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
+	//glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
+	//glfwWindowHint(GLFW_OPENGL_DEBUG_CONTEXT, GL_TRUE);
 
 	// Open the window
 	string title = "Chapter 4 -- " + recipe;

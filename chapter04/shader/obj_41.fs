@@ -2,10 +2,11 @@
 
 in vec3 Position;
 in vec3 Normal;
-in vec2 TexCoord;
+in highp vec3 Color;
 
 uniform sampler2D BaseTex;
 uniform sampler2D AlphaTex;
+uniform float SilhouetteMode;
 
 struct LightInfo {
   vec4 Position;  // Light position in eye coords.
@@ -23,7 +24,8 @@ uniform MaterialInfo Material;
 
 layout( location = 0 ) out vec4 FragColor;
 
-vec3 phongModel( vec3 pos, vec3 norm ) {
+vec3 phongModel( vec3 pos, vec3 norm )
+{
     vec3 s = normalize(vec3(Light.Position) - pos);
     vec3 v = normalize(-pos.xyz);
     vec3 r = reflect( -s, norm );
@@ -38,10 +40,16 @@ vec3 phongModel( vec3 pos, vec3 norm ) {
     return ambient + diffuse + spec;
 }
 
-void main() {
-    vec4 baseColor = vec4(0.0, 1.0, 1.0, 1.0);//texture( BaseTex, TexCoord );
-    //vec4 alphaMap = texture( AlphaTex, TexCoord );
-
-
-    FragColor = vec4( phongModel(Position,Normal), 1.0 ) * baseColor;
+void main()
+{
+    vec4 baseColor = vec4(0.58, 0.44, 0.86, 1.0);
+    
+    if(min(min(Color.x, Color.y), Color.z) < 1.0/50.0 && SilhouetteMode < 1.0)
+    {
+        FragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    }
+    else
+    {
+        FragColor = vec4( phongModel(Position,Normal), 1.0 ) * baseColor;
+    }
 }
