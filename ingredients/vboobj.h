@@ -13,7 +13,7 @@ private:
     std::vector<tinyobj::material_t> materials;
 
 public:
-    VBOObj(std::string inputfile = "monkey.obj");
+    VBOObj(std::string inputfile = "table.obj");
 
     void render();
 };

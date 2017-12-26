@@ -26,7 +26,7 @@ void SceneObj::initScene()
 
     object = new VBOObj();
     
-    //this->m_animate = false;
+    m_animate = false;
 
     projection = mat4(1.0f);
 
@@ -63,8 +63,8 @@ void SceneObj::render()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    vec3 cameraPos = vec3(6.0f * cos(angle), 0.25f, 6.0f * sin(angle));
-    view = glm::lookAt(cameraPos, vec3(0.0f,0.0f,0.0f), vec3(0.0f,1.0f,0.0f));
+    vec3 cameraPos = vec3(7.0f * cos(angle), 5.0f, 7.0f * sin(angle));
+    view = glm::lookAt(cameraPos, vec3(0.0f,-1.0f,0.0f), vec3(0.0f,1.0f,0.0f));
     
     glEnable(GL_CULL_FACE);
     
